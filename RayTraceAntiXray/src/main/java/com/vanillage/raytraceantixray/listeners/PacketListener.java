@@ -20,7 +20,6 @@ import com.vanillage.raytraceantixray.data.PlayerData;
 import com.vanillage.raytraceantixray.data.VectorialLocation;
 import com.vanillage.raytraceantixray.tasks.RayTraceCallable;
 
-import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.chunk.LevelChunk;
 
 public final class PacketListener extends PacketAdapter {
@@ -144,7 +143,9 @@ public final class PacketListener extends PacketAdapter {
             }
 
             ChunkCoordIntPair chunkCoordIntPair = event.getPacket().getChunkCoordIntPairs().read(0);
-            playerData.getChunks().remove(new LongWrapper(new ChunkPos(chunkCoordIntPair.getChunkX(), chunkCoordIntPair.getChunkZ()).toLong()));
+            int cx = chunkCoordIntPair.getChunkX();
+            int cz = chunkCoordIntPair.getChunkZ();
+            playerData.getChunks().remove(new LongWrapper((long) cx & 0xFFFFFFFFL | ((long) cz & 0xFFFFFFFFL) << 32));
         } else if (packetType == PacketType.Play.Server.RESPAWN) {
             // As with world changes, chunk unload packets aren't sent on respawn.
             // All required chunks are (re)sent afterwards.
